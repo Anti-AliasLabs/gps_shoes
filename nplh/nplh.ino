@@ -40,12 +40,14 @@ int HMC6352SlaveAddress = 0x42;
 int HMC6352ReadAddress = 0x41; //"A" in hex, A command is: 
 
 int headingValue;
+float startLat = 0.0;
+float startLon = 0.0;
 
 uint8_t latest_interrupted_pin;
 
 TinyGPS gps;
 
-static const float HOME = 51.508131, LONDON_LON = -0.128002;
+static const float LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 
 //---------------------------------------------------------------------------------
 // setup - called once at startup
@@ -61,10 +63,12 @@ void setup()
   HMC6352SlaveAddress = HMC6352SlaveAddress >> 1; // I know 0x42 is less than 127, but this is still required
   Wire.begin();
 
+  // set up interrupt for heel clicks
   pinMode(heelPin, INPUT); 
   digitalWrite(heelPin, HIGH);
   PCintPort::attachInterrupt(heelPin, &heelClicked, RISING);
 
+  // set up LED display
   for (int i=0; i<ledsLen; i++){
     pinMode(ledPins[i], OUTPUT); 
   }
@@ -102,57 +106,68 @@ void loop()
       if (feedgps())
         newdata = true;
     }
-    gpsdump(gps);
+    updateGPS(gps);
   }
-  else {
+  /*else {
     spinLights();
-  }
-
-
-  Serial.println();
+  }*/
 }
 
 //---------------------------------------------------------------------------------
 // gpsdump - reads in GPS data
 //---------------------------------------------------------------------------------
-static void gpsdump(TinyGPS &gps)
+static void updateGPS(TinyGPS &gps)
 {
   float flat, flon;
   unsigned long age, date, time, chars = 0;
   unsigned short sentences = 0, failed = 0;
-  static const float LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
-
   unsigned long invalid = 0;
 
 
   gps.f_get_position(&flat, &flon, &age);
 
+  // if GPS isn't receiving a signal, just flash lights
   if(TinyGPS::GPS_INVALID_F_ANGLE == flat || TinyGPS::GPS_INVALID_F_ANGLE == flon) {
     Serial.println("invalid position"); 
     spinLights();
   }
+  // if receiving a signal, go ahead and compute location and distance
   else{
-    //updateLightsHeading( readCompass() );
-    //updateLightsHeading( gps.f_course() );
-
     Serial.print("Current Latitude: ");
     Serial.print(flat);
     Serial.print(" Current Longitude: ");
     Serial.print(flon);
+
+    // keep track of where we are once we've started 
+    // navigating home (to keep track of distance travelled
+    // once we start going home)
+    if ( goHome && startLat == 0.0 && startLon == 0.0) {
+      startLat = flat;
+      startLon = flon;
+    }
+
+    // get current course
+    const char *str = TinyGPS::cardinal(gps.f_course());
+    updateLightsHeading(str);
+    //updateLightsHeading( readCompass() );
+    
+    int dist_so_far = TinyGPS::distance_between(startLat, startLon, flat, flon) / 1000;
+    int dist_to_go = TinyGPS::distance_between(flat, flon, LONDON_LAT, LONDON_LON) / 1000;
+    int course_to_home = TinyGPS::course_to(flat, flon, 51.508131, -0.128002);
+    
+    Serial.print(" Current Course: ");
+    Serial.print(" ");
+    Serial.print(gps.f_course());
+    Serial.print(" ");
+    Serial.println(str);
+    
+    Serial.print(" So far travelled ");
+    Serial.print(dist_so_far);
+    Serial.print(" To go ");
+    Serial.print(dist_to_go);
+    Serial.println(course_to_home);
+    
   }
-
-  // get current course
-  const char *str = TinyGPS::cardinal(gps.f_course());
-  updateLightsHeading(str);
-  Serial.print(" Current Course: ");
-  Serial.print(" ");
-  Serial.print(gps.f_course());
-  Serial.print(" ");
-  Serial.println(str);
-
-  //distance_between(flat, flon, LONDON_LAT, LONDON_LON) / 1000
-  //TinyGPS::course_to(flat, flon, 51.508131, -0.128002)
-  //TinyGPS::cardinal(TinyGPS::course_to(flat, flon, LONDON_LAT, LONDON_LON))
 }
 
 
@@ -278,6 +293,8 @@ void updateLightsHeading(const char *headingString)
   }
 
 }
+
+
 
 
 
