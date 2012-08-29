@@ -10,8 +10,6 @@
  
  Serial on 0 and 1
  LEDs 
- Reed switch on 10
- Compass on A4 and A5
  
  
  */
@@ -19,8 +17,10 @@
 #include <TinyGPS.h>
 #include <Wire.h>
 #include <PinChangeInt.h>
+#include <VirtualWire.h>
 
-const int heelPin = 5;
+
+const int heelPin = 17;
 
 const unsigned long timeLimit = 5000;
 const int triggerNum = 1;
@@ -109,8 +109,8 @@ void loop()
     updateGPS(gps);
   }
   /*else {
-    spinLights();
-  }*/
+   spinLights();
+   }*/
 }
 
 //---------------------------------------------------------------------------------
@@ -133,6 +133,7 @@ static void updateGPS(TinyGPS &gps)
   }
   // if receiving a signal, go ahead and compute location and distance
   else{
+    // get current course
     Serial.print("Current Latitude: ");
     Serial.print(flat);
     Serial.print(" Current Longitude: ");
@@ -145,28 +146,28 @@ static void updateGPS(TinyGPS &gps)
       startLat = flat;
       startLon = flon;
     }
-
-    // get current course
-    const char *str = TinyGPS::cardinal(gps.f_course());
-    updateLightsHeading(str);
     //updateLightsHeading( readCompass() );
-    
+
+    // update directions
     int dist_so_far = TinyGPS::distance_between(startLat, startLon, flat, flon) / 1000;
     int dist_to_go = TinyGPS::distance_between(flat, flon, LONDON_LAT, LONDON_LON) / 1000;
-    int course_to_home = TinyGPS::course_to(flat, flon, 51.508131, -0.128002);
-    
+    float current_course = gps.f_course();
+    float course_to_home = TinyGPS::course_to(flat, flon, 51.508131, -0.128002);
+
     Serial.print(" Current Course: ");
     Serial.print(" ");
-    Serial.print(gps.f_course());
+    Serial.print(current_course);
     Serial.print(" ");
-    Serial.println(str);
-    
+
     Serial.print(" So far travelled ");
     Serial.print(dist_so_far);
     Serial.print(" To go ");
     Serial.print(dist_to_go);
+    Serial.print(" ");
     Serial.println(course_to_home);
-    
+    const char *str = TinyGPS::cardinal(course_to_home);
+    updateLightsHeading(current_course, course_to_home);
+
   }
 }
 
@@ -273,26 +274,33 @@ void spinLights()
 //---------------------------------------------------------------------------------
 // updateLightsHeading - update light indicating north
 //---------------------------------------------------------------------------------
-void updateLightsHeading(const char *headingString)
+void updateLightsHeading(float c, float h)
 {
-  String  N = "N";
-  String  NE = "NE";
-  String  E = "E";
+  float w = 180/ledsLen;
+  int ledOn;
 
-  if (N.equals(headingString))
-  {
-    Serial.println("-----north");
+  if ( c-h > (360-w) || c-h < w ){
+    ledOn = 0;
   }
-  if (NE.equals(headingString))
-  {
-    Serial.println("-----north");
-  }
-  if (E.equals(headingString))
-  {
-    Serial.println("-----north");
+  else {
+    float f_ledOn = (c-h-w)/(360.0-w) * float(ledsLen);
+    ledOn = round(f_ledOn);
+    Serial.print(f_ledOn);
+    Serial.print(" ");
   }
 
+  //int ledOn = float(heading)/360.0 * ledsLen;
+  Serial.println(ledOn);
+  
+  
+
+  for (int i=0; i<ledsLen; i++){
+    digitalWrite(ledPins[i], LOW); 
+  }
+  digitalWrite(ledPins[ledOn], HIGH);
 }
+
+
 
 
 
