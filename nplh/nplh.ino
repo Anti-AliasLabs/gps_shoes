@@ -1,3 +1,5 @@
+
+
 /* 
  No Place Like Home
  Becky Stewart
@@ -18,6 +20,10 @@
 #include <Wire.h>
 #include <PinChangeInt.h>
 #include <VirtualWire.h>
+//#include <NoportcSoftwareSerial.h>
+
+#define NO_PORTA_PINCHANGES
+#define NO_PORTB_PINCHANGES
 
 
 const int heelPin = 17;
