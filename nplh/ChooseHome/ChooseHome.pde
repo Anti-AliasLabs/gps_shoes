@@ -1,9 +1,5 @@
 import processing.opengl.*;
 import codeanticode.glgraphics.*;
-import de.fhpotsdam.unfolding.*;
-import de.fhpotsdam.unfolding.geo.*;
-import de.fhpotsdam.unfolding.utils.*;
-import de.fhpotsdam.unfolding.providers.*;
 import guicomponents.*;
 
 import com.francisli.processing.http.*;
@@ -45,10 +41,10 @@ void setup() {
   searchButton = new GButton(this, "Search", boxX+120, boxY+100, 90, 30);
   searchButton.tag = "search";
 
-  inButton = new GButton(this, "+", boxX+240, boxY+70, 30, 30);
+  /*inButton = new GButton(this, "+", boxX+240, boxY+70, 30, 30);
   inButton.tag = "zoom in";
   outButton = new GButton(this, "-", boxX+240, boxY+110, 30, 30);
-  outButton.tag = "zoom out";
+  outButton.tag = "zoom out";*/
 
   uploadButton = new GButton(this, "Upload to Shoes", boxX+10, boxY+boxHeight, boxWidth-20, 40);
   uploadButton.tag = "upload";
@@ -63,8 +59,6 @@ void setup() {
   // load in images
   pointerImage = loadImage("pointershoe.png");
   logo = loadImage("logoshoe.gif");
-  
- 
 }
 
 void draw() {
@@ -76,7 +70,8 @@ void draw() {
   // draw cursor
   if (marker.x == -1) {
     image(pointerImage, mouseX-20, mouseY-37, 40, 75);
-  } else {
+  } 
+  else {
     float[] curr = map.getScreenPositionFromLocation(marker);
     image(pointerImage, curr[0]-20, curr[1]-37, 40, 75);
   }
@@ -110,9 +105,13 @@ void drawInstructions() {
 }
 
 void mouseClicked() {
-  markerX = mouseX;
-  markerY = mouseY;
-  
+  if (mouseX > boxX+boxWidth &&
+    mouseY > boxY+boxHeight)
+  {
+    markerX = mouseX;
+    markerY = mouseY;
+  }
+
   marker = map.getLocationFromScreenPosition((float)mouseX, (float)mouseY);
 }
 
@@ -120,7 +119,7 @@ void mouseClicked() {
 void handleTextFieldEvents(GTextField tfield) {
   if (tfield.getEventType() == GTextField.ENTERED)
   {
-    postcode = tfield.viewText(); 
+    postcode = tfield.viewText();
   }
 }
 
@@ -179,9 +178,8 @@ void responseReceived(HttpRequest request, HttpResponse response)
 
     longitude = results.get("results").get(0).get("geometry").get("location").get("lng").floatValue();
     latitude = results.get("results").get(0).get("geometry").get("location").get("lat").floatValue();
-       
+
     printLongitudeAndLatitude();
-     
   } 
   else {
     // output the entire response as a string
@@ -193,8 +191,8 @@ void responseReceived(HttpRequest request, HttpResponse response)
 // printLongitudeAndLatitude: print out co-ordinates
 void printLongitudeAndLatitude()
 {
-   println(latitude + ", " + longitude); 
-   marker.x = latitude;
-   marker.y = longitude;
+  println(latitude + ", " + longitude); 
+  marker.x = latitude;
+  marker.y = longitude;
 }
 
