@@ -1,7 +1,7 @@
-int centre = 10;
+int centre = 9;
 int leds[] = {
-  8, 9, 6, 2, 5, 4, 7, 3};
-
+  //4, 5, 7, 6, 14, 15, 16, 17};
+  6, 13, 14, 15, 16, 17, 8, 7};
 /*
   N  8
  NE 9
@@ -31,10 +31,11 @@ int fadeValue = 0;
 int fadeDirection = 2;
 
 void loop() {
-  int potValue = analogRead(A3);
+  //int potValue = analogRead(A3);
 
-  int pos = map(potValue, 0, 1023, 0, 9);
+  //int pos = map(potValue, 0, 1023, 0, 9);
   
+  int pos = 9;
   Serial.println(pos);
 
   // turn off ring lights lights

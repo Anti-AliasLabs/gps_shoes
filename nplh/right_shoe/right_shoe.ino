@@ -6,13 +6,10 @@
 #include <VirtualWire.h>
 
 // first LED with PWM fading needs to be in 3 (or same port)
-//int leds[] = {
-//  3, 7, 6, 5, 4};
 int leds[] = {
   3, 14, 15, 16, 17};
 int numLEDs = 5;
-int currBlink = 5;
-int prevPos = 0;
+int currBlink = 0;
 
 int j =0;
 int fadeValue = 0;
@@ -100,7 +97,7 @@ void distance_lights(int pos)
       fadeDirection = -1*fadeDirection;  
 
 
-    delay(30);
+    delay(50);
     Serial.println(fadeValue);
   }
 }

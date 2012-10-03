@@ -1,5 +1,5 @@
 int leds[] = {
-  9, 7, 6, 5, 4};
+  3, 7, 6, 5, 4};
 int numLEDs = 5;
 int currBlink = 0;
 int prevPos = 0;
@@ -28,6 +28,8 @@ void loop()
   int sensorValue = analogRead(A3);
   // convert to 5 point scale
   int pos = map(sensorValue, 0, 1023, 0, 6);
+  
+  pos = 0;
   Serial.println(pos);
   
   // simulate distance to destination
