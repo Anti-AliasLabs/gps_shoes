@@ -7,7 +7,7 @@
 
 // first LED with PWM fading needs to be in 3 (or same port)
 int leds[] = {
-  3, 14, 15, 16, 17};
+  3, 17, 16, 15, 14};
 int numLEDs = 5;
 int currBlink = 0;
 
@@ -48,20 +48,25 @@ void loop()
 	for (i = 0; i < buflen; i++)
 	{
             currBlink = buf[i];
-            
+            Serial.print("received: ");
 	    Serial.println(currBlink);
 	}
+
+        digitalWrite(13, false);
     }
     
     distance_lights(currBlink);
+    
+    //Serial.println("test");
+    //delay(1000);
 }
 
 
 void distance_lights(int pos)
 { 
-  Serial.print("blinking position: ");
-  Serial.print(pos);
-  Serial.print(" ");
+  //Serial.print("blinking position: ");
+  //Serial.println(pos);
+  //Serial.print(" ");
   // simulate distance to destination
   if(pos > 0) {
     if(pos < 6){
@@ -98,6 +103,6 @@ void distance_lights(int pos)
 
 
     delay(50);
-    Serial.println(fadeValue);
+    //Serial.println(fadeValue);
   }
 }
