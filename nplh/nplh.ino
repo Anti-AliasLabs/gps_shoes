@@ -23,7 +23,7 @@ SoftwareSerial softSerial(3, 4); // RX, TX
 const int gpsIn = 1;
 const int heelPin = 2;
 
-int centreLED = 9;
+int centreLED = 5;
 int ledPins[] = {
   6, 13, 14, 15, 16, 17, 8, 7};
 
@@ -59,7 +59,7 @@ float startLon = 0.0;
 
 TinyGPS gps;
 
-static const float LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
+float homeLat = 37.6922, homeLon = 97.3372;
 
 //---------------------------------------------------------------------------------
 // setup - called once at startup
@@ -165,13 +165,13 @@ static void updateGPS(TinyGPS &gps)
     }
 
     // update directions
-    int dist_so_far = TinyGPS::distance_between(startLat, startLon, flat, flon) / 1000;
-    int dist_to_go = TinyGPS::distance_between(flat, flon, LONDON_LAT, LONDON_LON) / 1000;
-    float current_course = gps.f_course()/100.0; // returned in 100ths of degree
-    float course_to_home = TinyGPS::course_to(flat, flon, 51.508131, -0.128002);
+    int total_dist = TinyGPS::distance_between(startLat, startLon, homeLat, homeLon) / 1000;
+    int dist_to_go = TinyGPS::distance_between(flat, flon, homeLat, homeLon) / 1000;
+    float current_course = gps.f_course(); 
+    float course_to_home = TinyGPS::course_to(flat, flon, homeLat, homeLon);
 
     // send distance to right shoe for lights
-    int d = map(dist_to_go, 0, TinyGPS::distance_between(startLat, startLon, LONDON_LAT, LONDON_LON)/1000, 0, 6);
+    int d = map(dist_to_go, 0, total_dist, 0, 6);
     sendDistanceToRight(d);
     softSerial.print(" Current Course: ");
     softSerial.print(TinyGPS::cardinal(gps.f_course()));
@@ -179,8 +179,7 @@ static void updateGPS(TinyGPS &gps)
     softSerial.print(current_course);
     softSerial.print(" ");
 
-    softSerial.print(" So far travelled ");
-    softSerial.print(dist_so_far);
+    
     softSerial.print(" To go ");
     softSerial.print(dist_to_go);
     softSerial.print(" ");
@@ -210,7 +209,7 @@ static bool feedgps()
 //---------------------------------------------------------------------------------
 void heelClicked() {
   currCount++;
-
+  Serial.println("click");
   // if this is the first knock
   // note the time
   if ( currCount == 1 )
@@ -267,6 +266,8 @@ void updateLightsHeading(float c, float h)
   // calculate LED based upon borders of (x*45)+22.5 degrees for x = (0...7) 
   ledOn = floor(modulo360(relativeAngle+22.5)/45);
 
+  digitalWrite(centreLED, LOW);
+  delay(100);
   digitalWrite(centreLED, HIGH);
   digitalWrite(ledPins[ledOn], HIGH);
   softSerial.println(ledOn);
