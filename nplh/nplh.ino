@@ -18,6 +18,8 @@
 #include <VirtualWire.h>
 #include <SoftwareSerial.h>
 
+SoftwareSerial softSerial(3, 4); // RX, TX
+
 const int gpsIn = 1;
 const int heelPin = 2;
 
@@ -65,6 +67,7 @@ static const float LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 void setup()
 {
   Serial.begin(57600);
+  softSerial.begin(9600);
 
   // set up interrupt for heel clicks
   pinMode(heelPin, INPUT); 
@@ -75,7 +78,11 @@ void setup()
   for (int i=0; i<ledsLen; i++){
     pinMode(ledPins[i], OUTPUT); 
   }
-  
+
+  // Initialise the IO and ISR
+  vw_set_ptt_inverted(true); // Required for DR3100
+  vw_setup(2000);	 // Bits per sec
+
   // initialise GPS reading timer
   lastGPSfeed = millis();
 }
@@ -93,15 +100,15 @@ void loop()
   if ( currCount > 0 && (loopStart-initDetect) > timeLimit )
   {
     currCount = 0; 
-    Serial.println("resetting counter");
+    softSerial.println("resetting counter");
   }
 
   // heels have been clicked
   if ( currCount >= triggerNum && (timeLimit-initDetect) )
   {
     // print the results to the serial monitor:
-    Serial.print("starting directions " );  
-    Serial.println(currCount);
+    softSerial.print("starting directions " );  
+    softSerial.println(currCount);
     currCount = 0;
     goHome = 1;
   }
@@ -109,12 +116,10 @@ void loop()
   // we are showing directions
   if ( goHome ){
     // Every second we print an update
-    if ( (loopStart - lastGPSfeed) > 1000)
+    while ( millis() - loopStart < 1000)
     {
       if (feedgps())
         newdata = true;
-       
-       lastGPSfeed = millis();
     }
     // spin lights if we don't have a signal
     // show directions if we do
@@ -146,10 +151,10 @@ static void updateGPS(TinyGPS &gps)
   // if receiving a signal, go ahead and compute location and distance
   else{
     // get current course
-    Serial.print("Current Latitude: ");
-    Serial.print(flat);
-    Serial.print(" Current Longitude: ");
-    Serial.print(flon);
+    softSerial.print("Current Latitude: ");
+    softSerial.print(flat);
+    softSerial.print(" Current Longitude: ");
+    softSerial.print(flon);
 
     // keep track of where we are once we've started 
     // navigating home (to keep track of distance travelled
@@ -158,25 +163,28 @@ static void updateGPS(TinyGPS &gps)
       startLat = flat;
       startLon = flon;
     }
-    //updateLightsHeading( readCompass() );
 
     // update directions
     int dist_so_far = TinyGPS::distance_between(startLat, startLon, flat, flon) / 1000;
     int dist_to_go = TinyGPS::distance_between(flat, flon, LONDON_LAT, LONDON_LON) / 1000;
-    float current_course = gps.f_course();
+    float current_course = gps.f_course()/100.0; // returned in 100ths of degree
     float course_to_home = TinyGPS::course_to(flat, flon, 51.508131, -0.128002);
 
-    Serial.print(" Current Course: ");
-    Serial.print(" ");
-    Serial.print(current_course);
-    Serial.print(" ");
+    // send distance to right shoe for lights
+    int d = map(dist_to_go, 0, TinyGPS::distance_between(startLat, startLon, LONDON_LAT, LONDON_LON)/1000, 0, 6);
+    sendDistanceToRight(d);
+    softSerial.print(" Current Course: ");
+    softSerial.print(TinyGPS::cardinal(gps.f_course()));
+    softSerial.print(" ");
+    softSerial.print(current_course);
+    softSerial.print(" ");
 
-    Serial.print(" So far travelled ");
-    Serial.print(dist_so_far);
-    Serial.print(" To go ");
-    Serial.print(dist_to_go);
-    Serial.print(" ");
-    Serial.println(course_to_home);
+    softSerial.print(" So far travelled ");
+    softSerial.print(dist_so_far);
+    softSerial.print(" To go ");
+    softSerial.print(dist_to_go);
+    softSerial.print(" ");
+    softSerial.println(course_to_home);
     const char *str = TinyGPS::cardinal(course_to_home);
     updateLightsHeading(current_course, course_to_home);
 
@@ -244,36 +252,55 @@ void spinLights()
 //---------------------------------------------------------------------------------
 void updateLightsHeading(float c, float h)
 {
-  
-  digitalWrite(ledPins[0], HIGH);
-  digitalWrite(ledPins[3], HIGH);
-  digitalWrite(ledPins[5], HIGH);
-  digitalWrite(ledPins[7], HIGH);
-  /*float w = 180/ledsLen;
+
+  //given a heading and a direction, calculate which of 8
+  // LEDs should light up (valued 0-7)
+  float relativeAngle;
   int ledOn;
 
-  if ( c-h > (360-w) || c-h < w ){
-    ledOn = 0;
-  }
-  else {
-    float f_ledOn = (c-h-w)/(360.0-w) * float(ledsLen);
-    ledOn = round(f_ledOn);
-    Serial.print(f_ledOn);
-    Serial.print(" ");
-  }
+  // calculate relative angle 
+  relativeAngle = c-h;
 
-  //int ledOn = float(heading)/360.0 * ledsLen;
-  Serial.println(ledOn);
+  // ensure relative angle is in the range 0-360
+  relativeAngle = modulo360((int)relativeAngle);
 
+  // calculate LED based upon borders of (x*45)+22.5 degrees for x = (0...7) 
+  ledOn = floor(modulo360(relativeAngle+22.5)/45);
 
-
-  for (int i=0; i<ledsLen; i++){
-    digitalWrite(ledPins[i], LOW); 
-  }
+  digitalWrite(centreLED, HIGH);
   digitalWrite(ledPins[ledOn], HIGH);
-  */
+  softSerial.println(ledOn);
 }
 
+//---------------------------------------------------------------------------------
+// modulo360: simple modulo 360. Negative numbers are set within
+// the 0-360 range which is not done by built in Processing modulo
+//---------------------------------------------------------------------------------
+float modulo360(int val)
+{
+  // ifval is < 0, set it within 0-360
+  while (val < 0)
+  {
+    val = val+360;
+  }
+
+  // if val is > 360, set within 0-360
+  val = val % 360;
+
+  return val;
+}
+
+//---------------------------------------------------------------------------------
+// sendDistanceToRight - sends an int between 1 and 6 to right shoe
+//---------------------------------------------------------------------------------
+void sendDistanceToRight(int dist)
+{
+  uint8_t msg[] = {
+    dist    };
+
+  vw_send(msg, 1);
+  vw_wait_tx(); // Wait until the whole message is gone
+}
 
 
 
