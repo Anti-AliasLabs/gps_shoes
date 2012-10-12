@@ -166,24 +166,26 @@ static void updateGPS(TinyGPS &gps)
 
     // update directions
     int total_dist = TinyGPS::distance_between(startLat, startLon, homeLat, homeLon) / 1000;
-    int dist_to_go = TinyGPS::distance_between(flat, flon, homeLat, homeLon) / 1000;
+    int dist_travelled = TinyGPS::distance_between(startLat, startLon, flat, flon) / 1000;
     float current_course = gps.f_course(); 
     float course_to_home = TinyGPS::course_to(flat, flon, homeLat, homeLon);
 
     // send distance to right shoe for lights
-    int d = map(dist_to_go, 0, total_dist, 0, 6);
+    int d = dist_travelled/total_dist * 6.0;
     sendDistanceToRight(d);
-    softSerial.print(" Current Course: ");
-    softSerial.print(TinyGPS::cardinal(gps.f_course()));
-    softSerial.print(" ");
-    softSerial.print(current_course);
-    softSerial.print(" ");
+    Serial.print(" Current Course: ");
+    Serial.print(TinyGPS::cardinal(gps.f_course()));
+    Serial.print(" ");
+    Serial.print(current_course);
+    Serial.print(" ");
 
     
-    softSerial.print(" To go ");
-    softSerial.print(dist_to_go);
-    softSerial.print(" ");
-    softSerial.println(course_to_home);
+    Serial.print(" To go ");
+    Serial.print(dist_travelled);
+    Serial.print(" ");
+    Serial.print(d);
+    Serial.print(" ");
+    Serial.println(course_to_home);
     const char *str = TinyGPS::cardinal(course_to_home);
     updateLightsHeading(current_course, course_to_home);
 
@@ -251,6 +253,10 @@ void spinLights()
 //---------------------------------------------------------------------------------
 void updateLightsHeading(float c, float h)
 {
+  // turn off all LEDs
+  for (int i=0; i<ledsLen; i++){
+    digitalWrite(ledPins[i], LOW); 
+  }
 
   //given a heading and a direction, calculate which of 8
   // LEDs should light up (valued 0-7)
