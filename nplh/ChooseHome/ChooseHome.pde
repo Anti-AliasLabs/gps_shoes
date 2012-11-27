@@ -54,9 +54,9 @@ void setup() {
   searchButton.tag = "search";
 
   /*inButton = new GButton(this, "+", boxX+240, boxY+70, 30, 30);
-  inButton.tag = "zoom in";
-  outButton = new GButton(this, "-", boxX+240, boxY+110, 30, 30);
-  outButton.tag = "zoom out";*/
+   inButton.tag = "zoom in";
+   outButton = new GButton(this, "-", boxX+240, boxY+110, 30, 30);
+   outButton.tag = "zoom out";*/
 
   uploadButton = new GButton(this, "Upload to Shoes", boxX+10, boxY+boxHeight, boxWidth-20, 40);
   uploadButton.tag = "upload";
@@ -122,9 +122,9 @@ void mouseClicked() {
   {
     markerX = mouseX;
     markerY = mouseY;
-  }
 
-  marker = map.getLocationFromScreenPosition((float)mouseX, (float)mouseY);
+    marker = map.getLocationFromScreenPosition((float)mouseX, (float)mouseY);
+  }
 }
 
 
