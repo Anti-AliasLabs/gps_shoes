@@ -28,10 +28,11 @@ PFont instructionsFont;
 int boxX = 20;
 int boxY = 20;
 int boxWidth = 280;
-int boxHeight = 150;
+int boxHeight = 200;
 
 GTextField postcodeBox;
-GButton searchButton, uploadButton, inButton, outButton;
+GImageButton searchButton, inButton, outButton, uploadButton;
+
 String postcode = "";
 Location marker = new Location(-1.0, -1.0);
 int markerX = -1;
@@ -49,16 +50,31 @@ void setup() {
 
   GComponent.globalColor = GCScheme.getColor(this, GCScheme.GREY_SCHEME);
   GComponent.globalFont = GFont.getFont(this, "Baskerville", 20);
-  postcodeBox = new GTextField(this, "", boxX+10, boxY+100, 100, 15, true);
-  searchButton = new GButton(this, "Search", boxX+120, boxY+100, 90, 30);
+  postcodeBox = new GTextField(this, "", boxX+10, boxY+180, 100, 15, true);
+
+  String[] search_files = {
+    "search_off.png", "search_over.png", "search_down.png"
+  };
+  searchButton = new GImageButton(this, null, search_files, boxX+120, boxY+180);
   searchButton.tag = "search";
 
-  /*inButton = new GButton(this, "+", boxX+240, boxY+70, 30, 30);
-   inButton.tag = "zoom in";
-   outButton = new GButton(this, "-", boxX+240, boxY+110, 30, 30);
-   outButton.tag = "zoom out";*/
+  String[] in_files = {
+    "zoom_in_off.png", "zoom_in_over.png", "zoom_in_down.png"
+  };
+  inButton = new GImageButton(this, null, in_files, boxX+240, boxY+140);
+  inButton.tag = "zoom in";
+  
+  String[] out_files = {
+    "zoom_out_off.png", "zoom_out_over.png", "zoom_out_down.png"
+  };
+  outButton = new GImageButton(this, null, out_files, boxX+240, boxY+180);
+  outButton.tag = "zoom out";
 
-  uploadButton = new GButton(this, "Upload to Shoes", boxX+10, boxY+boxHeight, boxWidth-20, 40);
+  //uploadButton = new GButton(this, "Upload to Shoes", boxX+10, boxY+boxHeight, boxWidth-20, 40);
+  String[] upload_files = {
+    "upload_off.png", "upload_over.png", "upload_down.png"
+  };
+  uploadButton = new GImageButton(this, null, upload_files, boxX+10, boxY+boxHeight+30);
   uploadButton.tag = "upload";
 
   //map = new de.fhpotsdam.unfolding.Map(this, new Google.GoogleMapProvider());
@@ -104,16 +120,13 @@ void drawInstructions() {
 
   stroke(0);
   fill(0);
-  //text("Your Title Here", boxX+40, boxY+30);
   image(logo, boxX+9, boxY+8, 265, 28);
   textSize(20);
 
-  text("Post Code Search", boxX+10, boxY+90);
-  //text("+  to zoom in", boxX+20, boxY+100);
-  //text("-  to zoom out", boxX+20, boxY+130);
+  text("Post Code Search", boxX+10, boxY+170);
 
-  //text("click on map", boxX+20, boxY+180);
-  //text("to select destination", boxX+20, boxY+210);
+  text("Click on map or type post code", boxX+10, boxY+110);
+  text("to select destination.", boxX+10, boxY+133);
 }
 
 void mouseClicked() {
@@ -135,8 +148,8 @@ void handleTextFieldEvents(GTextField tfield) {
   }
 }
 
-void handleButtonEvents(GButton button) {
-  if (button.eventType == GButton.CLICKED)
+void handleImageButtonEvents(GImageButton button) {
+  if (button.eventType == GImageButton.CLICKED)
   {
     if (button.tag == "search")
     { 
