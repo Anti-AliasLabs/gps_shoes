@@ -30,6 +30,7 @@ int boxY = 20;
 int boxWidth = 280;
 int boxHeight = 200;
 
+
 GTextField postcodeBox;
 GImageButton searchButton, inButton, outButton, uploadButton;
 
@@ -37,6 +38,8 @@ String postcode = "";
 Location marker = new Location(-1.0, -1.0);
 int markerX = -1;
 int markerY = -1;
+
+int zoomLevel = 12;
 
 float longitude = -1;
 float latitude = -1;
@@ -80,7 +83,7 @@ void setup() {
   //map = new de.fhpotsdam.unfolding.Map(this, new Google.GoogleMapProvider());
   map = new de.fhpotsdam.unfolding.Map(this);
   //map.zoomAndPanTo(new Location(51.508131f, -0.128002f), 12);
-  map.zoomAndPanTo(new Location(51.508131f, -0.128002f), 12);
+  map.zoomAndPanTo(new Location(51.508131f, -0.128002f), zoomLevel);
 
   MapUtils.createDefaultEventDispatcher(this, map);
 
@@ -158,10 +161,14 @@ void handleImageButtonEvents(GImageButton button) {
     }
     if (button.tag == "zoom in")
     { 
+      zoomLevel++;
+      map.zoomToLevel(zoomLevel);
       println("zoom in");
     }
     if (button.tag == "zoom out")
     {
+      zoomLevel--;
+      map.zoomToLevel(zoomLevel);
       println("zoom out");
     }
     if (button.tag == "upload")
