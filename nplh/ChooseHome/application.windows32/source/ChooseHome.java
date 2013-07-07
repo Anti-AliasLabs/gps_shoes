@@ -1,20 +1,61 @@
-import de.fhpotsdam.unfolding.mapdisplay.*;
-import de.fhpotsdam.unfolding.utils.*;
-import de.fhpotsdam.unfolding.marker.*;
-import de.fhpotsdam.unfolding.tiles.*;
-import de.fhpotsdam.unfolding.interactions.*;
-import de.fhpotsdam.unfolding.*;
-import de.fhpotsdam.unfolding.core.*;
-import de.fhpotsdam.unfolding.geo.*;
-import de.fhpotsdam.unfolding.events.*;
-import de.fhpotsdam.utils.*;
-import de.fhpotsdam.unfolding.providers.*;
+import processing.core.*; 
+import processing.xml.*; 
 
-import processing.opengl.*;
-import codeanticode.glgraphics.*;
-import guicomponents.*;
+import de.fhpotsdam.unfolding.mapdisplay.*; 
+import de.fhpotsdam.unfolding.utils.*; 
+import de.fhpotsdam.unfolding.marker.*; 
+import de.fhpotsdam.unfolding.tiles.*; 
+import de.fhpotsdam.unfolding.interactions.*; 
+import de.fhpotsdam.unfolding.*; 
+import de.fhpotsdam.unfolding.core.*; 
+import de.fhpotsdam.unfolding.geo.*; 
+import de.fhpotsdam.unfolding.events.*; 
+import de.fhpotsdam.utils.*; 
+import de.fhpotsdam.unfolding.providers.*; 
+import processing.opengl.*; 
+import codeanticode.glgraphics.*; 
+import guicomponents.*; 
+import com.francisli.processing.http.*; 
+import de.fhpotsdam.unfolding.*; 
+import de.fhpotsdam.unfolding.geo.*; 
+import de.fhpotsdam.unfolding.utils.*; 
+import de.fhpotsdam.unfolding.*; 
+import de.fhpotsdam.unfolding.geo.*; 
+import de.fhpotsdam.unfolding.utils.*; 
 
-import com.francisli.processing.http.*;
+import java.applet.*; 
+import java.awt.Dimension; 
+import java.awt.Frame; 
+import java.awt.event.MouseEvent; 
+import java.awt.event.KeyEvent; 
+import java.awt.event.FocusEvent; 
+import java.awt.Image; 
+import java.io.*; 
+import java.net.*; 
+import java.text.*; 
+import java.util.*; 
+import java.util.zip.*; 
+import java.util.regex.*; 
+
+public class ChooseHome extends PApplet {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 de.fhpotsdam.unfolding.Map map;
 
@@ -35,7 +76,7 @@ GTextField postcodeBox;
 GImageButton searchButton, inButton, outButton, uploadButton;
 
 String postcode = "";
-Location marker = new Location(-1.0, -1.0);
+Location marker = new Location(-1.0f, -1.0f);
 int markerX = -1;
 int markerY = -1;
 
@@ -44,7 +85,7 @@ int zoomLevel = 12;
 float longitude = -1;
 float latitude = -1;
 
-void setup() {
+public void setup() {
   size(1000, 800, GLConstants.GLGRAPHICS);
 
   // look and fonts
@@ -93,7 +134,7 @@ void setup() {
   logo = loadImage("logoshoe.gif");
 }
 
-void draw() {
+public void draw() {
   //draw map
   background(0);
   map.draw();
@@ -112,15 +153,15 @@ void draw() {
   drawInstructions();
 }
 
-void drawInstructions() {
+public void drawInstructions() {
 
   noStroke();
   fill(255, 190);
   // title rect
-  rect(boxX, boxY, boxWidth, boxHeight*0.3);
+  rect(boxX, boxY, boxWidth, boxHeight*0.3f);
 
   // interface rect
-  rect(boxX, boxY+boxHeight*0.4, boxWidth, boxHeight);
+  rect(boxX, boxY+boxHeight*0.4f, boxWidth, boxHeight);
 
   stroke(0);
   fill(0);
@@ -133,7 +174,7 @@ void drawInstructions() {
   text("to select destination.", boxX+10, boxY+133);
 }
 
-void mouseClicked() {
+public void mouseClicked() {
   if (mouseX > boxX+boxWidth &&
     mouseY > boxY+boxHeight)
   {
@@ -145,14 +186,14 @@ void mouseClicked() {
 }
 
 
-void handleTextFieldEvents(GTextField tfield) {
+public void handleTextFieldEvents(GTextField tfield) {
   if (tfield.getEventType() == GTextField.ENTERED)
   {
     postcode = tfield.viewText();
   }
 }
 
-void handleImageButtonEvents(GImageButton button) {
+public void handleImageButtonEvents(GImageButton button) {
   if (button.eventType == GImageButton.CLICKED)
   {
     if (button.tag == "search")
@@ -183,7 +224,7 @@ void handleImageButtonEvents(GImageButton button) {
 // getCoordinatesFromString: given a string-based post-code it queries
 // Google Maps API for the longitude and latitude. Response is handled
 // by the responseReceived function
-void getCoordinatesFromString(String location)
+public void getCoordinatesFromString(String location)
 {
   // create new client
   HttpClient client = new HttpClient(this, "maps.googleapis.com");
@@ -203,7 +244,7 @@ void getCoordinatesFromString(String location)
 // responseReceived: implemented here to handle responses from
 // Google API so that the latitude and longitude of a response
 // are stored in global varialbles 'longitude' and 'latitude'
-void responseReceived(HttpRequest request, HttpResponse response) 
+public void responseReceived(HttpRequest request, HttpResponse response) 
 {
   // check for HTTP 200 success code
   if (response.statusCode == 200) {
@@ -222,10 +263,155 @@ void responseReceived(HttpRequest request, HttpResponse response)
 
 // -------------------------------------------------------------
 // printLongitudeAndLatitude: print out co-ordinates
-void printLongitudeAndLatitude()
+public void printLongitudeAndLatitude()
 {
   println(latitude + ", " + longitude); 
   marker.x = latitude;
   marker.y = longitude;
 }
 
+
+
+
+
+class UploadButton
+{
+  de.fhpotsdam.unfolding.Map map;
+
+  int xPos, yPos, mPos;
+  int markerPlaced, markerX, markerY;
+  
+  int buttonWidth, buttonHeight;
+  int unclicked = color(50);
+  int hovered = color(100);
+  int clicked = color(150);
+
+  UploadButton(de.fhpotsdam.unfolding.Map m, int x, int y)
+  {
+    // size and placement
+    xPos = x;
+    yPos = y;
+    buttonWidth = 230;
+    buttonHeight = 50;
+
+    mPos = 0; // unclicked button
+    
+    // marker variables
+    markerPlaced = 0;
+    
+    map = m;
+  }
+
+  public void display()
+  {
+    noStroke();
+    switch(mPos) {
+    case 0:
+      fill(unclicked);
+      break;
+    case 1:
+      fill(hovered);
+      break;
+    case 2:
+      fill(clicked);
+      break;
+    }
+
+    rect(xPos, yPos, buttonWidth, buttonHeight);
+    textSize(22);
+    fill(230);
+    text("Upload to Shoe", xPos + 30, yPos+30);
+  }
+
+  public void update()
+  {
+    mPos = 0; // button unclicked
+    if (mouseX > xPos &&
+        mouseX < xPos + buttonWidth &&
+        mouseY > yPos &&
+        mouseY < yPos + buttonHeight) {
+      mPos = 1; // button hovered over
+      if (mousePressed) {
+        mPos = 2; // button clicked
+      }
+    } else {
+      // mouse clicked but
+    }
+  }
+}
+
+
+
+
+
+class ZoomButton
+{
+  de.fhpotsdam.unfolding.Map map;
+  
+  int xPos, yPos, mPos;
+  int buttonSize;
+  
+  boolean zoom;
+  
+  int unclicked = color(50);
+  int hovered = color(100);
+  int clicked = color(150);
+
+  ZoomButton(de.fhpotsdam.unfolding.Map m, int x, int y, boolean direction)
+  {
+    xPos = x;
+    yPos = y;
+    buttonSize = 30;
+
+    mPos = 0;
+    
+    zoom = direction;
+    
+    map = m;
+  }
+
+  public void display()
+  {
+    noStroke();
+    switch(mPos) {
+    case 0:
+      fill(unclicked);
+      break;
+    case 1:
+      fill(hovered);
+      break;
+    case 2:
+      fill(clicked);
+      break;
+    }
+
+    rect(xPos, yPos, buttonSize, buttonSize);
+    textSize(22);
+    fill(230);
+    
+    if(zoom)
+    {
+      text("+", xPos+8, yPos+23);
+    } else {
+      text("-", xPos+10, yPos+22);
+    }
+  }
+
+  public void update()
+  {
+    mPos = 0;
+    if (mouseX > xPos &&
+        mouseX < xPos + buttonSize &&
+        mouseY > yPos &&
+        mouseY < yPos + buttonSize) {
+      mPos = 1;
+      if (mousePressed) {
+        mPos = 2;
+      }
+    }
+  } 
+}
+  static public void main(String args[]) {
+    PApplet.main(new String[] { "--present", "--bgcolor=#666666", "--stop-color=#cccccc", "ChooseHome" });
+  }
+}
