@@ -1,3 +1,5 @@
+import processing.serial.*;
+
 import de.fhpotsdam.unfolding.mapdisplay.*;
 import de.fhpotsdam.unfolding.utils.*;
 import de.fhpotsdam.unfolding.marker.*;
@@ -16,6 +18,8 @@ import guicomponents.*;
 
 import com.francisli.processing.http.*;
 
+
+
 de.fhpotsdam.unfolding.Map map;
 
 boolean responseProcessed = false;
@@ -29,6 +33,11 @@ int boxX = 20;
 int boxY = 20;
 int boxWidth = 280;
 int boxHeight = 200;
+
+// communication with shoe
+boolean uploading = false;
+Serial shoePort;
+String portName ="";
 
 
 GTextField postcodeBox;
@@ -66,7 +75,7 @@ void setup() {
   };
   inButton = new GImageButton(this, null, in_files, boxX+240, boxY+140);
   inButton.tag = "zoom in";
-  
+
   String[] out_files = {
     "zoom_out_off.png", "zoom_out_over.png", "zoom_out_down.png"
   };
@@ -92,7 +101,7 @@ void setup() {
   pointerImage = loadImage("pointershoe.png");
   logo = loadImage("logoshoe.gif");
 }
-
+// -------------------------------------------------------------
 void draw() {
   //draw map
   background(0);
@@ -110,8 +119,15 @@ void draw() {
 
   // draw instructions
   drawInstructions();
-}
 
+  // if uploading
+  if ( uploading )
+  {
+    // draw upload status
+    drawUploadStatus();
+  }
+}
+// -------------------------------------------------------------
 void drawInstructions() {
 
   noStroke();
@@ -132,7 +148,7 @@ void drawInstructions() {
   text("Click on map or type post code", boxX+10, boxY+110);
   text("to select destination.", boxX+10, boxY+133);
 }
-
+// -------------------------------------------------------------
 void mouseClicked() {
   if (mouseX > boxX+boxWidth &&
     mouseY > boxY+boxHeight)
@@ -144,14 +160,14 @@ void mouseClicked() {
   }
 }
 
-
+// -------------------------------------------------------------
 void handleTextFieldEvents(GTextField tfield) {
   if (tfield.getEventType() == GTextField.ENTERED)
   {
     postcode = tfield.viewText();
   }
 }
-
+// -------------------------------------------------------------
 void handleImageButtonEvents(GImageButton button) {
   if (button.eventType == GImageButton.CLICKED)
   {
@@ -175,6 +191,7 @@ void handleImageButtonEvents(GImageButton button) {
     if (button.tag == "upload")
     { 
       println("upload");
+      uploadToShoe();
     }
   }
 }
@@ -227,5 +244,22 @@ void printLongitudeAndLatitude()
   println(latitude + ", " + longitude); 
   marker.x = latitude;
   marker.y = longitude;
+}
+// -------------------------------------------------------------
+void uploadToShoe() 
+{
+  uploading = true;
+  portName = Serial.list()[0];
+  println( portName );
+  shoePort = new Serial(this, portName, 9600);
+}
+// -------------------------------------------------------------
+void drawUploadStatus() 
+{
+  noStroke();
+  fill( 255 );
+  rect(width/2-100, height/2-70, 200, 140 );
+  fill(0);
+  text("Connected to shoe", width/2-80, height/2-20 );
 }
 
