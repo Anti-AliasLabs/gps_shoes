@@ -40,6 +40,7 @@ boolean shoeConnected = false;
 Serial shoePort;
 String portName = "";
 
+int uploadTimer = 0;
 
 GTextField postcodeBox;
 GImageButton searchButton, inButton, outButton, uploadButton;
@@ -124,6 +125,18 @@ void draw() {
   // if uploading
   if ( uploading )
   {
+    // fake it til you make it
+    int timeNow = millis();
+    if ( timeNow-uploadTimer < 1500 ) {
+      shoeConnected = false;
+    }
+    if ( timeNow-uploadTimer >= 1500 &&
+      timeNow-uploadTimer < 2500) {
+      shoeConnected = true;
+    }
+    if ( timeNow-uploadTimer >= 2500 ) {
+      uploading = false;
+    }
     // draw upload status
     drawUploadStatus();
   }
@@ -250,10 +263,12 @@ void printLongitudeAndLatitude()
 void uploadToShoe() 
 {
   uploading = true;
-  portName = Serial.list()[0];
-  println( portName );
-  shoePort = new Serial(this, portName, 9600);
-  shoePort.bufferUntil('\n');
+  //portName = Serial.list()[0];
+  //println( portName );
+  //shoePort = new Serial(this, portName, 9600);
+  //shoePort.bufferUntil('\n');
+
+  uploadTimer = millis();
 }
 // -------------------------------------------------------------
 void drawUploadStatus() 
@@ -271,45 +286,46 @@ void drawUploadStatus()
 
     int intLat = (int) ( latitude * 100000);
     int intLon = (int) ( longitude * 100000);
-    
-    
+
+
 
     String sendLat = Integer.toString( intLat );
     String sendLon = Integer.toString( intLon );
-    
-    if( intLon%100 < 1 ) {
-      if( intLon < 0 ) {
+
+    if ( intLon%100 < 1 ) {
+      if ( intLon < 0 ) {
         sendLon = "-00" + sendLon.substring(1, sendLon.length());
       }
     }
-    
+
     println(sendLat);
     println(sendLon);
     println( "---------");
-    
+
     // compensate for negative sign
-    if ( intLat < 0 ) {
-      shoePort.write( sendLat.substring(0, 6) );
-    } 
-    else {
-      shoePort.write( sendLat.substring(0, 5) );
-    }
-    shoePort.write(',');
-    if ( intLon < 0 ) {
-      shoePort.write(sendLon.substring(0, 6));
-    } 
-    else {
-      shoePort.write(sendLon.substring(0, 5));
-    }
-    shoePort.write('\n');
+    /*if ( intLat < 0 ) {
+     shoePort.write( sendLat.substring(0, 6) );
+     } 
+     else {
+     shoePort.write( sendLat.substring(0, 5) );
+     }
+     shoePort.write(',');
+     if ( intLon < 0 ) {
+     shoePort.write(sendLon.substring(0, 6));
+     } 
+     else {
+     shoePort.write(sendLon.substring(0, 5));
+     }
+     shoePort.write('\n');
     uploading = false;
+    */
   } 
   else
   {
     fill(0);
     text("Connecting to shoe...", width/2-80, height/2 );
     // send test message to see if shoe is connected
-    shoePort.write("connected\n");
+    //shoePort.write("connected\n");
   }
 }
 
