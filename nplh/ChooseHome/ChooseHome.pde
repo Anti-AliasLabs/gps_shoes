@@ -260,29 +260,56 @@ void drawUploadStatus()
 {
   noStroke();
   fill( 255 );
-  rect(width/2-100, height/2-70, 200, 140 );
+  rect(width/2-130, height/2-50, 260, 100 );
 
   if ( shoeConnected )
   {
     fill(0);
-    text("Connected to shoe", width/2-80, height/2-20 );
-    int a = 52345678;
-    int b = 52345678;
-    String sendLat = Integer.toString(a);
-    String sendLon = Integer.toString(b);
-    shoePort.write(sendLat);
+    text("Connected to shoe", width/2-80, height/2 );
+    println(latitude);
+    println(longitude);
+
+    int intLat = (int) ( latitude * 100000);
+    int intLon = (int) ( longitude * 100000);
+    
+    
+
+    String sendLat = Integer.toString( intLat );
+    String sendLon = Integer.toString( intLon );
+    
+    if( intLon%100 < 1 ) {
+      if( intLon < 0 ) {
+        sendLon = "-00" + sendLon.substring(1, sendLon.length());
+      }
+    }
+    
+    println(sendLat);
+    println(sendLon);
+    println( "---------");
+    
+    // compensate for negative sign
+    if ( intLat < 0 ) {
+      shoePort.write( sendLat.substring(0, 6) );
+    } 
+    else {
+      shoePort.write( sendLat.substring(0, 5) );
+    }
     shoePort.write(',');
-    shoePort.write(sendLon);
+    if ( intLon < 0 ) {
+      shoePort.write(sendLon.substring(0, 6));
+    } 
+    else {
+      shoePort.write(sendLon.substring(0, 5));
+    }
     shoePort.write('\n');
     uploading = false;
   } 
   else
   {
     fill(0);
-    text("Connecting to shoe...", width/2-80, height/2-20 );
+    text("Connecting to shoe...", width/2-80, height/2 );
     // send test message to see if shoe is connected
     shoePort.write("connected\n");
-    
   }
 }
 
