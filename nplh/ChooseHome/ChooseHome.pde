@@ -39,7 +39,6 @@ boolean uploading = false;
 boolean shoeConnected = false;
 Serial shoePort;
 String portName = "";
-String inString = "";
 
 
 GTextField postcodeBox;
@@ -267,6 +266,15 @@ void drawUploadStatus()
   {
     fill(0);
     text("Connected to shoe", width/2-80, height/2-20 );
+    int a = 52345678;
+    int b = 52345678;
+    String sendLat = Integer.toString(a);
+    String sendLon = Integer.toString(b);
+    shoePort.write(sendLat);
+    shoePort.write(',');
+    shoePort.write(sendLon);
+    shoePort.write('\n');
+    uploading = false;
   } 
   else
   {
@@ -280,9 +288,12 @@ void drawUploadStatus()
 
 void serialEvent( Serial p )
 {
-  inString = p.readString();
+  String inString = p.readStringUntil('\n');
+  inString = inString.replace('\n', ' ');
+  String trimmedString = trim(inString);
+  println(inString);
 
-  if ( inString == "shoe\n" )
+  if ( trimmedString.equals("shoe") )
     shoeConnected = true;
 }
 
