@@ -62,13 +62,19 @@ void parseUpdatedLocation() {
   int comma = inputString.indexOf( ',' );
 
   if( comma > 0 ) {
-    String tempLat = inputString.substring( 0, comma-1 );
-    String tempLon = inputString.substring( comma+1, inputString.length() ); 
-    //Serial.println(tempLat);
-    //Serial.println(tempLon);
+    String tempLat = inputString.substring( 0, comma );
+    String tempLon = inputString.substring( comma+1, inputString.length()-1 ); 
+    Serial.println(tempLat);
+    Serial.println(tempLon);
+    
+    char latChar[8];
+    tempLat.toCharArray(latChar, tempLat.length());   
 
-    int tempLatInt = tempLat.toInt();
+    unsigned long tempLatInt = atol(latChar);
     int tempLonInt = tempLon.toInt();
+    
+    Serial.println(tempLatInt);
+    Serial.println(tempLonInt);
 
     writeLatitude( tempLatInt );
     writeLongitude( tempLonInt );
@@ -79,15 +85,15 @@ void parseUpdatedLocation() {
 }
 
 float readLongitude() {
-  return  EEPROM.readLong( addressLon )/ 10000.0;
+  return  EEPROM.readInt( addressLon )/ 100000.0;
 }
 
 float readLatitude() {
-  return EEPROM.readLong( addressLat ) /10000.0;
+  return EEPROM.readLong( addressLat ) /100000.0;
 }
 
-void writeLongitude( long ln ) {
-  EEPROM.writeLong( addressLon, ln );
+void writeLongitude( int ln ) {
+  EEPROM.writeInt( addressLon, ln );
 }
 
 void writeLatitude( int lt ) {
