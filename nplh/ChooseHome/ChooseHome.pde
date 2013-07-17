@@ -95,8 +95,8 @@ void setup() {
   //map = new de.fhpotsdam.unfolding.Map(this, new Google.GoogleMapProvider());
   //map = new de.fhpotsdam.unfolding.Map(this);
   //map.zoomAndPanTo(new Location(51.508131f, -0.128002f), 12);
-  map.zoomAndPanTo(new Location(51.508131f, -0.128002f), zoomLevel);
-
+  //map.zoomAndPanTo(new Location(51.508131f, -0.128002f), zoomLevel); //London
+  map.zoomAndPanTo( new Location(52.0360f, -0.7700f), zoomLevel ); //Milton Keynes
   MapUtils.createDefaultEventDispatcher(this, map);
 
   // load in images
@@ -258,6 +258,7 @@ void printLongitudeAndLatitude()
   println(latitude + ", " + longitude); 
   marker.x = latitude;
   marker.y = longitude;
+  map.zoomAndPanTo( marker, zoomLevel ); //Milton Keynes
 }
 // -------------------------------------------------------------
 void uploadToShoe() 
