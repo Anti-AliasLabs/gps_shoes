@@ -1,3 +1,3 @@
 
 ChooseHome
-ChooseHome.jar,core.jar,json4processing.jar,log4j-1.2.15.jar,Unfolding.jar,gluegen-rt.jar,jogl.jar,opengl.jar,GLGraphics.jar,guicomponents.jar,commons-codec-1.4.jar,commons-logging-1.1.1.jar,http.jar,httpclient-4.1.2.jar,httpclient-cache-4.1.2.jar,httpcore-4.1.2.jar,httpmime-4.1.2.jar,signpost-commonshttp4-1.2.1.1.jar,signpost-core-1.2.1.1.jar,stringtree-json-2.0.10.jar
+ChooseHome.jar,core.jar,serial.jar,RXTXcomm.jar,old-RXTXcomm.jar,json4processing.jar,Unfolding.jar,log4j-1.2.15.jar,opengl.jar,gluegen-rt.jar,jogl.jar,GLGraphics.jar,guicomponents.jar,http.jar,commons-codec-1.4.jar,httpcore-4.1.2.jar,signpost-commonshttp4-1.2.1.1.jar,signpost-core-1.2.1.1.jar,httpclient-4.1.2.jar,stringtree-json-2.0.10.jar,httpclient-cache-4.1.2.jar,commons-logging-1.1.1.jar,httpmime-4.1.2.jar

@@ -50,7 +50,7 @@
 	<string>ppc</string>
       </array>
       <key>ClassPath</key>
-      <string>$JAVAROOT/ChooseHome.jar:$JAVAROOT/core.jar:$JAVAROOT/json4processing.jar:$JAVAROOT/log4j-1.2.15.jar:$JAVAROOT/Unfolding.jar:$JAVAROOT/gluegen-rt.jar:$JAVAROOT/jogl.jar:$JAVAROOT/opengl.jar:$JAVAROOT/GLGraphics.jar:$JAVAROOT/guicomponents.jar:$JAVAROOT/commons-codec-1.4.jar:$JAVAROOT/commons-logging-1.1.1.jar:$JAVAROOT/http.jar:$JAVAROOT/httpclient-4.1.2.jar:$JAVAROOT/httpclient-cache-4.1.2.jar:$JAVAROOT/httpcore-4.1.2.jar:$JAVAROOT/httpmime-4.1.2.jar:$JAVAROOT/signpost-commonshttp4-1.2.1.1.jar:$JAVAROOT/signpost-core-1.2.1.1.jar:$JAVAROOT/stringtree-json-2.0.10.jar</string>
+      <string>$JAVAROOT/ChooseHome.jar:$JAVAROOT/core.jar:$JAVAROOT/serial.jar:$JAVAROOT/RXTXcomm.jar:$JAVAROOT/old-RXTXcomm.jar:$JAVAROOT/json4processing.jar:$JAVAROOT/Unfolding.jar:$JAVAROOT/log4j-1.2.15.jar:$JAVAROOT/opengl.jar:$JAVAROOT/gluegen-rt.jar:$JAVAROOT/jogl.jar:$JAVAROOT/GLGraphics.jar:$JAVAROOT/guicomponents.jar:$JAVAROOT/http.jar:$JAVAROOT/commons-codec-1.4.jar:$JAVAROOT/httpcore-4.1.2.jar:$JAVAROOT/signpost-commonshttp4-1.2.1.1.jar:$JAVAROOT/signpost-core-1.2.1.1.jar:$JAVAROOT/httpclient-4.1.2.jar:$JAVAROOT/stringtree-json-2.0.10.jar:$JAVAROOT/httpclient-cache-4.1.2.jar:$JAVAROOT/commons-logging-1.1.1.jar:$JAVAROOT/httpmime-4.1.2.jar</string>
 
       <!-- http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
       <key>Properties</key>
